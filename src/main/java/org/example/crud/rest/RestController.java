@@ -38,6 +38,4 @@ public class RestController {
         }
         return  theFamilys.get(familyId);
     }
-
-
 }
