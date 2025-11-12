@@ -48,3 +48,9 @@ primary key(`id`)
 insert into `employee` values
 (1, 'Leslie', 'Andrews', 'leslie@gmail.com'),
 (2, 'Peter', 'Parker', 'pêtr@gmail.com');
+
+# Setup application.properties
+
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/employee_directory || student_tracker
+spring.datasource.username=springstudent
+spring.datasource.password=springstudent
