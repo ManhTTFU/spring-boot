@@ -8,29 +8,25 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class DemoSecurityConfig {
 
+    // add support for jdbc ... no more hardcode users
+
     @Bean
-    public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        UserDetails john = User.builder()
-                .username("john")
-                .password("{noop}test123")
-                .roles("EMPLOYEE").build();
+    public UserDetailsManager userDetailsManager(DataSource dataSource) {
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 
-        UserDetails mary = User.builder()
-                .username("mary")
-                .password("{noop}test123")
-                .roles("MANAGER", "EMPLOYEE").build();
+        jdbcUserDetailsManager.setUsersByUsernameQuery("select user_id, pw, active from members where user_id=?");
 
-        UserDetails susan = User.builder()
-                .username("susan")
-                .password("{noop}test123")
-                .roles("MANAGER", "EMPLOYEE", "ADMIN").build();
-
-        return new InMemoryUserDetailsManager(john, mary, susan);
+        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select user_id, role from roles where user_id=?");
+        return jdbcUserDetailsManager;
     }
 
     @Bean
@@ -38,6 +34,11 @@ public class DemoSecurityConfig {
 
         http.authorizeHttpRequests(configurer ->
                 configurer
+                    .requestMatchers(
+                            "/v3/api-docs/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html"
+                    ).permitAll()
                     .requestMatchers(HttpMethod.GET, "api/employees").hasRole("EMPLOYEE")
                     .requestMatchers(HttpMethod.GET, "api/employees/**").hasRole("EMPLOYEE")
                     .requestMatchers(HttpMethod.POST, "api/employees").hasRole("MANAGER")
@@ -53,4 +54,24 @@ public class DemoSecurityConfig {
         http.csrf(csrf -> csrf.disable());
         return http.build();
     }
+
+//    @Bean
+//    public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
+//        UserDetails john = User.builder()
+//                .username("john")
+//                .password("{noop}test123")
+//                .roles("EMPLOYEE").build();
+//
+//        UserDetails mary = User.builder()
+//                .username("mary")
+//                .password("{noop}test123")
+//                .roles("MANAGER", "EMPLOYEE").build();
+//
+//        UserDetails susan = User.builder()
+//                .username("susan")
+//                .password("{noop}test123")
+//                .roles("MANAGER", "EMPLOYEE", "ADMIN").build();
+//
+//        return new InMemoryUserDetailsManager(john, mary, susan);
+//    }
 }
