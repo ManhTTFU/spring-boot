@@ -1,6 +1,10 @@
 package org.example.crud;
 
+import org.example.crud.DAO.AppDAO;
+import org.example.crud.DAO.EmployeeRepository;
 import org.example.crud.DAO.studentDAO;
+import org.example.crud.entity.Instructor;
+import org.example.crud.entity.InstructorDetail;
 import org.example.crud.entity.Student;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,18 +20,41 @@ public class CrudApplication {
 		SpringApplication.run(CrudApplication.class, args);
 	}
 
+//    @Bean
+//    public CommandLineRunner commandLineRunner(studentDAO studentDAO) {
+//        return args -> {
+////            createStudent(studentDAO);
+////            readStudent(studentDAO);
+////            queryStudent(studentDAO);
+////            queryStudentByLastName(studentDAO);
+////            updateStudent(studentDAO);
+////            deleteStudent(studentDAO);
+////            deleteAllStudent(studentDAO);
+//        };
+//    }
+
     @Bean
-    public CommandLineRunner commandLineRunner(studentDAO studentDAO) {
+    public CommandLineRunner commandLineRunner(AppDAO appDAO) {
         return args -> {
-//            createStudent(studentDAO);
-//            readStudent(studentDAO);
-//            queryStudent(studentDAO);
-//            queryStudentByLastName(studentDAO);
-//            updateStudent(studentDAO);
-//            deleteStudent(studentDAO);
-//            deleteAllStudent(studentDAO);
+//            System.out.println("Hello world");
+            createInstructor(appDAO);
         };
+
     }
+
+    private void createInstructor(AppDAO appDAO) {
+        Instructor instructor = new Instructor("Chad", "Darby", "darby@gmail.com");
+        InstructorDetail instructorDetail = new InstructorDetail("http://www.luv2code.com/youtube", "luv2code");
+
+        // associate the object
+
+        instructor.setInstructorDetail(instructorDetail);
+
+        // save the instructor
+        System.out.printf("Save instructor %s\n", instructor);
+        appDAO.save(instructor);
+    }
+
 
     private void deleteAllStudent(studentDAO studentDAO) {
         System.out.println("Deleting all students");
